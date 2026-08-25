@@ -1,16 +1,33 @@
 import DepthText from './DepthText.jsx'
 import MoltenMetal from './MoltenMetal.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
+import { useTheme } from '../lib/theme.js'
+
+// The React Bits pieces paint to a canvas and to inline styles, so they cannot
+// read CSS tokens — each theme passes its own colours in.
+const FIELD = {
+  dark: { color1: '#3A1D8F', color2: '#7C5CFF', color3: '#B7F5E2', brightness: 1.45, blackPoint: 0.035 },
+  light: { color1: '#C4B5FD', color2: '#6039E8', color3: '#0F766E', brightness: 1.1, blackPoint: 0.09 }
+}
+
+const TITLE = {
+  dark: { face: '#F2F3FA', depth: '#7C5CFF' },
+  light: { face: '#171833', depth: '#6039E8' }
+}
 
 export default function Hero({ fileName, duration }) {
   const working = Boolean(fileName)
+  const { theme } = useTheme()
+  const field = FIELD[theme]
+  const title = TITLE[theme]
 
   return (
     <header className={`hero ${working ? 'is-working' : ''}`}>
       <div className="hero__field" aria-hidden="true">
         <MoltenMetal
-          color1="#3A1D8F"
-          color2="#7C5CFF"
-          color3="#B7F5E2"
+          color1={field.color1}
+          color2={field.color2}
+          color3={field.color3}
           speed={0.2}
           scale={3.1}
           detail={4}
@@ -18,14 +35,16 @@ export default function Hero({ fileName, duration }) {
           coreSize={0.1}
           swirl={1.1}
           fold={-0.24}
-          blackPoint={0.035}
-          brightness={1.45}
+          blackPoint={field.blackPoint}
+          brightness={field.brightness}
           colorMode="molten"
           grainIntensity={0.035}
           mouseInteraction={false}
-          opacity={working ? 0.4 : 0.9}
+          opacity={working ? 0.4 : theme === 'light' ? 0.7 : 0.9}
         />
       </div>
+
+      <ThemeToggle />
 
       <div className="hero__inner">
         <h1 className="hero__title">
@@ -33,8 +52,8 @@ export default function Hero({ fileName, duration }) {
             text="SPLICE"
             layers={working ? 16 : 30}
             depth={working ? 1.5 : 2.3}
-            faceColor="#F2F3FA"
-            depthColor="#7C5CFF"
+            faceColor={title.face}
+            depthColor={title.depth}
             tilt={6}
             smoothing={0.12}
             orbitSpeed={0.2}

@@ -1,5 +1,8 @@
 import ElectricBorder from './ElectricBorder.jsx'
 import { commandLine } from '../lib/ffmpegRunner.js'
+import { useTheme } from '../lib/theme.js'
+
+const ARM = { dark: '#4CE0B3', light: '#0E9F77' }
 
 export default function RunPanel({
   ready,
@@ -15,6 +18,7 @@ export default function RunPanel({
   sampleArgs,
   fileName
 }) {
+  const { theme } = useTheme()
   const armed = ready && !job.running
 
   const runButton = (
@@ -77,7 +81,7 @@ export default function RunPanel({
       )}
 
       {armed ? (
-        <ElectricBorder color="#4CE0B3" speed={1.15} chaos={0.14} thickness={2} borderRadius={14} className="run__arm">
+        <ElectricBorder color={ARM[theme]} speed={1.15} chaos={0.14} thickness={2} borderRadius={14} className="run__arm">
           {runButton}
         </ElectricBorder>
       ) : (

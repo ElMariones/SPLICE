@@ -1,8 +1,13 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import ElectricBorder from './ElectricBorder.jsx'
 import { ResultList, downloadAll, totalBytes, readableSize } from './Results.jsx'
+import { useTheme } from '../lib/theme.js'
+
+const FRAME = { dark: '#4CE0B3', light: '#0E9F77' }
 
 export default function ResultsModal({ results, baseName, ext, onClose }) {
+  const { theme } = useTheme()
   const primaryRef = useRef(null)
   const returnFocusRef = useRef(null)
 
@@ -24,9 +29,11 @@ export default function ResultsModal({ results, baseName, ext, onClose }) {
 
   if (!results.length) return null
 
-  return (
+  // Rendered outside .app so no ancestor's clipping or stacking context can
+  // move or crop it.
+  return createPortal(
     <div className="sheet" onPointerDown={e => e.target === e.currentTarget && onClose()}>
-      <ElectricBorder color="#4CE0B3" speed={1} chaos={0.1} borderRadius={20} className="sheet__frame">
+      <ElectricBorder color={FRAME[theme]} speed={1} chaos={0.1} borderRadius={20} className="sheet__frame">
         <div
           className="sheet__body"
           role="dialog"
@@ -71,6 +78,7 @@ export default function ResultsModal({ results, baseName, ext, onClose }) {
           </div>
         </div>
       </ElectricBorder>
-    </div>
+    </div>,
+    document.body
   )
 }

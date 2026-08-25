@@ -2,6 +2,9 @@ import { forwardRef } from 'react'
 import ElectricBorder from './ElectricBorder.jsx'
 import TimelineRail from './TimelineRail.jsx'
 import VolumeControl from './VolumeControl.jsx'
+import { useTheme } from '../lib/theme.js'
+
+const FRAME = { dark: '#7C5CFF', light: '#6039E8' }
 import { formatPrecise } from '../lib/time.js'
 
 const RATES = [0.25, 0.5, 1, 1.5, 2]
@@ -35,9 +38,11 @@ const Stage = forwardRef(function Stage(
   },
   videoRef
 ) {
+  const { theme } = useTheme()
+
   return (
     <section className="stage" aria-label="Player">
-      <ElectricBorder color="#7C5CFF" speed={0.6} chaos={0.055} thickness={2} borderRadius={18}>
+      <ElectricBorder color={FRAME[theme]} speed={0.6} chaos={0.055} thickness={2} borderRadius={18}>
         <div className="stage__screen">
           <video
             ref={videoRef}

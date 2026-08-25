@@ -22,6 +22,9 @@ so the whole app is static files — it works on GitHub Pages with no server.
   the nearest keyframe. Precise re-encodes to hit the exact frame.
 - **Download the batch.** A panel under the player lists every finished clip,
   and a popup offers the whole set as one `.zip` the moment slicing ends.
+- **Light and dark.** Follows your system theme and switches the moment you
+  change it, no reload. The button in the corner cycles Auto → Light → Dark
+  when you want to override it.
 
 Your cut list is saved per file, so reopening the same video brings it back.
 
@@ -54,6 +57,27 @@ npm run dev
 
 `vite.config.js` sets `base: './'`, so the same build works at a repo subpath or
 at a domain root with no edits.
+
+## How theming works
+
+The palette lives entirely in CSS custom properties, so light mode is a
+redefinition of the same roles rather than a second stylesheet.
+
+In **Auto**, no `data-theme` attribute is set at all. That is deliberate: the
+decision is left to a `prefers-color-scheme` block, so the palette tracks the
+system even if no JavaScript event ever arrives. Choosing Light or Dark stamps
+`data-theme` on `<html>`, which wins over the media query.
+
+The canvas-based components (`MoltenMetal`, `ElectricBorder`, `DepthText`) paint
+colours they are handed as props and cannot read CSS variables. They ask
+`lib/theme.js` which palette won, and it answers by reading a `--scheme` token
+back out of the computed style — so the stylesheet stays the single source of
+truth and the two halves cannot disagree.
+
+A small inline script in `index.html` stamps the theme before first paint, so
+the page never flashes the wrong palette.
+
+Contrast was checked against WCAG AA for normal text in both palettes.
 
 ## How ffmpeg gets into the page
 

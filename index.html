@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Splice — browser video splitter</title>
     <meta name="description" content="Mark in and out points on a local video and cut it into numbered clips. Runs entirely in your browser." />
+    <meta name="theme-color" content="#07070b" />
+    <script>
+      // Stamp the theme before first paint so the page never flashes the
+      // wrong palette. lib/theme.js takes over once the bundle runs.
+      (function () {
+        try {
+          var stored = localStorage.getItem('splice.theme');
+          var explicit = stored === 'light' || stored === 'dark' ? stored : null;
+          if (explicit) {
+            document.documentElement.dataset.theme = explicit;
+            document.documentElement.style.colorScheme = explicit;
+          } else {
+            // Leave the attribute off so the stylesheet's prefers-color-scheme
+            // block decides, and keep following the system from there.
+            document.documentElement.style.colorScheme = 'light dark';
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307070B'/%3E%3Crect x='7' y='9' width='7' height='14' rx='1.5' fill='%234CE0B3'/%3E%3Crect x='18' y='9' width='7' height='14' rx='1.5' fill='%23FF4D8D'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

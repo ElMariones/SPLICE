@@ -1,9 +1,13 @@
 import { useRef, useState } from 'react'
 import ElectricBorder from './ElectricBorder.jsx'
+import { useTheme } from '../lib/theme.js'
+
+const FRAME = { dark: '#7C5CFF', light: '#6039E8' }
 
 export default function Dropzone({ onFile, compact }) {
   const inputRef = useRef(null)
   const [over, setOver] = useState(false)
+  const { theme } = useTheme()
 
   const take = files => {
     const file = Array.from(files || []).find(f => f.type.startsWith('video/') || /\.(mp4|mkv|mov|webm|m4v|avi|ts)$/i.test(f.name))
@@ -43,7 +47,7 @@ export default function Dropzone({ onFile, compact }) {
   if (compact) return zone
 
   return (
-    <ElectricBorder color="#7C5CFF" speed={0.7} chaos={0.07} borderRadius={20} className="dropzone__frame">
+    <ElectricBorder color={FRAME[theme]} speed={0.7} chaos={0.07} borderRadius={20} className="dropzone__frame">
       {zone}
     </ElectricBorder>
   )
