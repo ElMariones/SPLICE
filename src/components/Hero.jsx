@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import DepthText from './DepthText.jsx'
 import MoltenMetal from './MoltenMetal.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
@@ -15,7 +16,7 @@ const TITLE = {
   light: { face: '#171833', depth: '#6039E8' }
 }
 
-export default function Hero({ fileName, duration }) {
+function Hero({ fileName, fileSize, duration }) {
   const working = Boolean(fileName)
   const { theme } = useTheme()
   const field = FIELD[theme]
@@ -70,10 +71,17 @@ export default function Hero({ fileName, duration }) {
           <p className="hero__loaded">
             <span className="hero__loaded-label">Loaded</span>
             <span className="hero__loaded-name">{fileName}</span>
+            {fileSize ? <span className="hero__loaded-size">{sizeLabel(fileSize)}</span> : null}
             {duration ? <span className="hero__loaded-dur">{duration}</span> : null}
           </p>
         )}
       </div>
     </header>
   )
+}
+
+export default memo(Hero)
+
+function sizeLabel(bytes) {
+  return bytes >= 1024 ** 3 ? `${(bytes / 1024 ** 3).toFixed(1)} GB` : `${Math.max(1, Math.round(bytes / 1024 ** 2))} MB`
 }

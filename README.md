@@ -9,37 +9,65 @@ so the whole app is static files — it works on GitHub Pages with no server.
 
 ## What it does
 
-- **Mark while you watch.** <kbd>I</kbd> and <kbd>O</kbd> set the in and out
-  points at the playhead. Step one frame with <kbd>,</kbd> and <kbd>.</kbd> —
+- **Mark while you watch.** <kbd>I</kbd> starts a clip at the playhead and
+  <kbd>O</kbd> closes it. Pressing <kbd>O</kbd> with nothing open cuts from the
+  previous out point, so tapping <kbd>O</kbd> at each boundary tiles a video
+  into back-to-back clips. Step one frame with <kbd>,</kbd> and <kbd>.</kbd> —
   the frame rate is measured from the file, not assumed.
-- **See the whole cut plan.** Every clip is a lit segment on the timeline strip
-  under the video. Drag either edge to adjust it; the video scrubs as you drag.
+- **Navigate without fear.** Pressing anywhere on the timeline scrubs, even on
+  top of a clip. Finished clips only change when you mean it: dragging a grip,
+  typing a time, the *head* buttons, or <kbd>Shift</kbd>+<kbd>I</kbd>/<kbd>O</kbd>
+  on the selected clip. <kbd>I</kbd> and <kbd>O</kbd> never rewrite a finished cut.
+- **Undo everything.** <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>.
+  A whole drag or a burst of typing is one step; removing or clearing clips
+  offers Undo right in the notification.
+- **See the whole cut plan.** Every clip is a lit segment on the timeline. Drag
+  either edge to trim — edges move by how far you drag and snap to the
+  playhead and to other clips (hold <kbd>Alt</kbd> to drag freely). Hovering
+  shows a frame preview. Zoom with <kbd>Ctrl</kbd>+scroll, <kbd>+</kbd>/<kbd>−</kbd>,
+  or the buttons; a minimap shows where you are.
 - **Type times instead, if you prefer.** The fields take `1:34`, `01:02:33`,
-  bare seconds (`94`), and fractions (`7:13.5`).
+  bare seconds (`94`), and fractions (`7:13.5`). <kbd>↑</kbd>/<kbd>↓</kbd> nudge
+  by a second (<kbd>Shift</kbd> 10 s, <kbd>Alt</kbd> 0.1 s).
 - **Name the batch.** Outputs are numbered `{base}01.mp4`, `{base}02.mp4`, … and
-  any single clip can override the name.
+  any single clip can override the name. The number in the list is the number
+  in the file name, even if an unfinished clip sits in between.
 - **Fast or precise.** Fast copies the stream — seconds per clip, cuts land on
   the nearest keyframe. Precise re-encodes to hit the exact frame.
-- **Download the batch.** A panel under the player lists every finished clip,
-  and a popup offers the whole set as one `.zip` the moment slicing ends.
+- **Check, then download.** Every finished clip can be watched in place before
+  you save it, singly or as one `.zip`. Stop aborts immediately and keeps what
+  is already cut.
+- **Take it elsewhere.** Export or import the cut list as plain text
+  (`start  end  [name]` per line), or download the batch as a `.sh` script for
+  a native ffmpeg.
 - **Light and dark.** Follows your system theme and switches the moment you
-  change it, no reload. The button in the corner cycles Auto → Light → Dark
-  when you want to override it.
+  change it, no reload. The button in the corner cycles Auto → Light → Dark.
 
 Your cut list is saved per file, so reopening the same video brings it back.
+Drop a video anywhere on the page to open it.
 
 ### Keyboard
 
+Press <kbd>?</kbd> in the app for the full list.
+
 | Key | Action |
 |---|---|
-| <kbd>Space</kbd> | Play / pause |
-| <kbd>I</kbd> / <kbd>O</kbd> | Mark in / mark out at the playhead |
+| <kbd>Space</kbd> / <kbd>K</kbd> | Play / pause · pause |
+| <kbd>J</kbd> / <kbd>L</kbd> | −5 s / +5 s |
+| <kbd>I</kbd> / <kbd>O</kbd> | Mark in / mark out |
+| <kbd>Shift</kbd>+<kbd>I</kbd> / <kbd>O</kbd> | Trim the selected clip to the playhead |
+| <kbd>[</kbd> / <kbd>]</kbd> | Jump to the selected clip's in / out |
 | <kbd>N</kbd> | New clip at the playhead |
+| <kbd>P</kbd> | Preview the selected clip |
+| <kbd>Del</kbd> / <kbd>Esc</kbd> | Remove / deselect the selected clip |
 | <kbd>,</kbd> / <kbd>.</kbd> | Step one frame |
 | <kbd>←</kbd> / <kbd>→</kbd> | ±1 second (hold <kbd>Shift</kbd> for ±10) |
+| <kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd> | Zoom the timeline in / out / fit |
 | <kbd>↑</kbd> / <kbd>↓</kbd> | Volume up / down |
 | <kbd>M</kbd> | Mute |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Jump to start / end |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Undo / redo |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Run slice |
 
 ## Run it locally
 
@@ -91,8 +119,8 @@ the library spawns that URL as a *module* worker, while the worker code calls
 `importScripts`, which module workers do not have. Both routes fail, which is
 why these two files are local.
 
-The 32 MB core is fetched from unpkg on first use and cached by the browser
-afterwards. Refresh the vendored files with `npm run vendor:ffmpeg`.
+The 32 MB core is fetched from unpkg in the background as soon as you have a
+clip to cut, and cached by the browser afterwards. Refresh the vendored files with `npm run vendor:ffmpeg`.
 
 The single-threaded core is deliberate: the multi-threaded build needs
 `SharedArrayBuffer`, which needs COOP/COEP response headers, which GitHub Pages
@@ -100,8 +128,9 @@ does not send.
 
 ## Limits worth knowing
 
-- The source has to fit in the tab's memory. Past roughly 1.2 GB you may run
-  out; the app warns you before you start.
+- The source is mounted into ffmpeg with WORKERFS, so it is read from disk on
+  demand rather than copied into memory. Very large files can still strain a
+  tab; the app warns past 1.2 GB, and the `.sh` export is the fallback.
 - Fast mode cuts on keyframes, so a clip can begin slightly early or run
   slightly long. Precise mode fixes that at the cost of speed.
 - Cutting is stream-copy by default, so the output container must be able to

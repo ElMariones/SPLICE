@@ -64,3 +64,15 @@ export function formatShort(seconds) {
 function pad(n) {
   return String(n).padStart(2, '0')
 }
+
+// Ruler and hover labels. Shows as many decimals as the step needs, so a
+// zoomed-in ruler reads 1:04.5 and a zoomed-out one stays 1:04.
+export function formatTick(seconds, step = 1) {
+  const decimals = step >= 1 ? 0 : step >= 0.1 ? 1 : 2
+  const t = Math.max(0, seconds || 0)
+  if (!decimals) return formatShort(Math.round(t))
+  const scale = 10 ** decimals
+  const rounded = Math.round(t * scale)
+  const whole = Math.floor(rounded / scale)
+  return `${formatShort(whole)}.${String(rounded % scale).padStart(decimals, '0')}`
+}
